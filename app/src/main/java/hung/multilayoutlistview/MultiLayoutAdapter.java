@@ -16,6 +16,7 @@ import java.util.List;
  */
 public class MultiLayoutAdapter extends ArrayAdapter {
     public static final int TYPE_YOU = 0;
+    public static final int TYPE_ME_IMAGE = 1;
     public static final int TYPE_ME = 2;
     private final List<ListItems> objects;
 
@@ -53,6 +54,12 @@ public class MultiLayoutAdapter extends ArrayAdapter {
                 TextView txtInfo = (TextView) convertView.findViewById(R.id.txtInfo);
                 viewHolder = new ViewHolder(txtMessage, txtInfo);
                 convertView.setTag(viewHolder);
+            }else {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.message_img_me, null);
+                ImageView imageView = (ImageView) convertView.findViewById(R.id.img_sned);
+                TextView txtInfo = (TextView) convertView.findViewById(R.id.txtInfo);
+                viewHolder = new ViewHolder(imageView, txtInfo);
+                convertView.setTag(viewHolder);
             }
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -60,18 +67,28 @@ public class MultiLayoutAdapter extends ArrayAdapter {
         if(listViewItemType == TYPE_YOU) {
             viewHolder.getMessage().setText(listItems.getMessage());
             viewHolder.getInfo().setText(listItems.getInfo());
-            viewHolder.getImage().setImageResource(listItems.getImage());
-        }else {
+            viewHolder.getHead().setImageResource(listItems.getHead());
+            final String finalStrText = listItems.getMessage();
+            viewHolder.getMessage().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getContext(), finalStrText, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else if(listViewItemType == TYPE_ME){
             viewHolder.getMessage().setText(listItems.getMessage());
             viewHolder.getInfo().setText(listItems.getInfo());
+            final String finalStrText = listItems.getMessage();
+            viewHolder.getMessage().setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getContext(), finalStrText, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else {
+            viewHolder.getImage().setImageDrawable(listItems.getImage());
+            viewHolder.getInfo().setText(listItems.getInfo());
         }
-        final String finalStrText = listItems.getMessage();
-        viewHolder.getMessage().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), finalStrText, Toast.LENGTH_SHORT).show();
-            }
-        });
         return convertView;
     }
 
@@ -79,13 +96,18 @@ public class MultiLayoutAdapter extends ArrayAdapter {
         TextView textMessage;
         TextView textInfo;
         ImageView img;
-        public ViewHolder(TextView textMessage, TextView textInfo, ImageView img) {
+        ImageView imgHead;
+        public ViewHolder(TextView textMessage, TextView textInfo, ImageView imgHead) {
             this.textMessage = textMessage;
             this.textInfo = textInfo;
-            this.img = img;
+            this.imgHead = imgHead;
         }
         public ViewHolder(TextView textMessage, TextView textInfo) {
             this.textMessage = textMessage;
+            this.textInfo = textInfo;
+        }
+        public ViewHolder(ImageView img, TextView textInfo) {
+            this.img = img;
             this.textInfo = textInfo;
         }
         public TextView getMessage() {
@@ -97,14 +119,8 @@ public class MultiLayoutAdapter extends ArrayAdapter {
         public ImageView getImage() {
             return img;
         }
-        public void setMessage(TextView textMessage) {
-            this.textMessage = textMessage;
-        }
-        public void setInfo(TextView textInfo) {
-            this.textInfo = textInfo;
-        }
-        public void setImage(ImageView img) {
-            this.img = img;
+        public ImageView getHead() {
+            return imgHead;
         }
     }
 
