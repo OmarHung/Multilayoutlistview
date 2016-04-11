@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -14,14 +15,11 @@ import java.util.List;
  * Created by Hung on 2016/4/10.
  */
 public class MultiLayoutAdapter extends ArrayAdapter {
-    public static final int TYPE_LEFT_TXT = 0;
-    public static final int TYPE_LEFT_IMG = 1;
-    public static final int TYPE_RIGHT_TXT = 2;
-    public static final int TYPE_RIGHT_IMG = 3;
+    public static final int TYPE_YOU = 0;
+    public static final int TYPE_ME = 2;
+    private final List<ListItems> objects;
 
-    private ListItems[] objects;
-
-    public MultiLayoutAdapter(Context context, int resource, ListItems[] objects) {
+    public MultiLayoutAdapter(Context context, int resource, List<ListItems> objects) {
         super(context, resource, objects);
         this.objects = objects;
     }
@@ -33,70 +31,81 @@ public class MultiLayoutAdapter extends ArrayAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return objects[position].getType();
+        return objects.get(position).getType();
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
-        ListItems listItems = objects[position];
+        ListItems listItems = objects.get(position);
         int listViewItemType = getItemViewType(position);
         if (convertView == null) {
-            if (listViewItemType == TYPE_LEFT_TXT) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_left_text, null);
-                TextView textView = (TextView) convertView.findViewById(R.id.txt);
-                viewHolder = new ViewHolder(textView);
+            if (listViewItemType == TYPE_YOU) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.message_text_you, null);
+                TextView txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
+                TextView txtInfo = (TextView) convertView.findViewById(R.id.txtInfo);
+                ImageView imageView = (ImageView) convertView.findViewById(R.id.img_you);
+                viewHolder = new ViewHolder(txtMessage, txtInfo, imageView);
                 convertView.setTag(viewHolder);
-            } else if (listViewItemType == TYPE_LEFT_IMG) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_left_image, null);
-                ImageView imageView = (ImageView) convertView.findViewById(R.id.img);
-                viewHolder = new ViewHolder(imageView);
-                convertView.setTag(viewHolder);
-            } else if (listViewItemType == TYPE_RIGHT_TXT) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_right_text, null);
-                TextView textView = (TextView) convertView.findViewById(R.id.txt);
-                viewHolder = new ViewHolder(textView);
-                convertView.setTag(viewHolder);
-            } else {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listview_right_image, null);
-                ImageView imageView = (ImageView) convertView.findViewById(R.id.img);
-                viewHolder = new ViewHolder(imageView);
+            }else if (listViewItemType == TYPE_ME) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.message_text_me, null);
+                TextView txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
+                TextView txtInfo = (TextView) convertView.findViewById(R.id.txtInfo);
+                viewHolder = new ViewHolder(txtMessage, txtInfo);
                 convertView.setTag(viewHolder);
             }
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        if(listViewItemType==TYPE_LEFT_TXT || listViewItemType==TYPE_RIGHT_TXT) viewHolder.getText().setText(listItems.getText());
-        else viewHolder.getImage().setImageResource(listItems.getImage());
+        if(listViewItemType == TYPE_YOU) {
+            viewHolder.getMessage().setText(listItems.getMessage());
+            viewHolder.getInfo().setText(listItems.getInfo());
+            viewHolder.getImage().setImageResource(listItems.getImage());
+        }else {
+            viewHolder.getMessage().setText(listItems.getMessage());
+            viewHolder.getInfo().setText(listItems.getInfo());
+        }
+        final String finalStrText = listItems.getMessage();
+        viewHolder.getMessage().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), finalStrText, Toast.LENGTH_SHORT).show();
+            }
+        });
         return convertView;
     }
 
     public class ViewHolder {
-        TextView text;
+        TextView textMessage;
+        TextView textInfo;
         ImageView img;
-        public ViewHolder(TextView text) {
-            this.text = text;
-        }
-        public ViewHolder(ImageView img) {
+        public ViewHolder(TextView textMessage, TextView textInfo, ImageView img) {
+            this.textMessage = textMessage;
+            this.textInfo = textInfo;
             this.img = img;
         }
-
-        public TextView getText() {
-            return text;
+        public ViewHolder(TextView textMessage, TextView textInfo) {
+            this.textMessage = textMessage;
+            this.textInfo = textInfo;
         }
-
+        public TextView getMessage() {
+            return textMessage;
+        }
+        public TextView getInfo() {
+            return textInfo;
+        }
         public ImageView getImage() {
             return img;
         }
-
-        public void setText(TextView text) {
-            this.text = text;
+        public void setMessage(TextView textMessage) {
+            this.textMessage = textMessage;
         }
-
+        public void setInfo(TextView textInfo) {
+            this.textInfo = textInfo;
+        }
         public void setImage(ImageView img) {
             this.img = img;
         }
-
     }
 
 }
